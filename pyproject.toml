@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "babymoe-research"
+version = "0.1.0"
+description = "BabyLM 2026 multilingual dense/MoE training and routing analysis"
+requires-python = ">=3.10"
+dependencies = [
+  "accelerate>=1.4,<2",
+  "datasets>=3.2,<5",
+  "huggingface-hub>=0.31,<2",
+  "numpy>=1.26,<3",
+  "pyarrow>=21,<26",
+  "pyyaml>=6.0,<7",
+  "safetensors>=0.5,<1",
+  "tokenizers>=0.21,<0.23",
+  "tqdm>=4.66,<5",
+  "transformers==4.57.3",
+]
+
+[project.optional-dependencies]
+analysis = [
+  "matplotlib>=3.8,<4",
+  "pandas>=2.2,<3",
+  "psutil>=5.9,<8",
+  "scikit-learn>=1.5,<2",
+  "scipy>=1.13,<2",
+  "wandb>=0.18,<1",
+]
+dev = [
+  "pytest>=8.2,<9",
+  "torch>=2.4",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

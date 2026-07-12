@@ -1,0 +1,125 @@
+experiment:
+  project_name: babymoe-babylm2026
+  track: multilingual
+  condition_id: base
+  primary_seed: 42
+  seed_pool: [13, 42, 71]
+
+paths:
+  # In Colab this is overridden with the persistent Google Drive directory.
+  artifacts_root: artifacts
+  data_dir: data
+  tokenizer_dir: tokenizer/joint_bpe_16k
+  runs_dir: runs
+  cache_dir: hf_cache
+
+data:
+  repos:
+    eng: BabyLM-community/babylm-eng
+    nld: BabyLM-community/babylm-nld
+    zho: BabyLM-community/babylm-zho
+  revisions:
+    eng: b78a9336aacf2d876aeb6d289869191443f8d41f
+    nld: 1aa063f7e59b84090489bcab6ca1cfa2b911188d
+    zho: 600a6657f55eabbea5bc56041ef6b8a33440501f
+  text_field: text
+  token_count_field: num-tokens
+  document_id_field: doc-id
+  domain_field: category
+  unique_exposure_units: 100_000_000
+  minimum_quota_fill_ratio: 0.995
+  max_epochs: 10
+  mixture: {eng: 0.333334, nld: 0.333333, zho: 0.333333}
+  # Competition CFP values. The zho dataset card currently reports 0.935966;
+  # keep this configurable until the organizers confirm the final convention.
+  byte_premium: {eng: 1.0, nld: 1.0516, zho: 0.9894}
+  dataset_card_byte_premium: {eng: 1.0, nld: 1.051606, zho: 0.935966}
+  byte_premium_source: BabyLM-2026-CfP-v2
+  accounting_formula: raw_count_divided_by_byte_premium
+  validation_units_per_language: 100_000
+  selection_seed: 2026
+  shuffle_documents: true
+  trust_remote_code: false
+
+tokenizer:
+  algorithm: byte_level_bpe
+  vocab_size: 16_384
+  min_frequency: 2
+  train_chars_per_language: 10_000_000
+  model_max_length: 1024
+  special_tokens:
+    unk_token: "<unk>"
+    bos_token: "<s>"
+    eos_token: "</s>"
+    pad_token: "<pad>"
+
+model:
+  family: mistral
+  hidden_size: 768
+  intermediate_size: 2048
+  num_hidden_layers: 12
+  num_attention_heads: 12
+  num_key_value_heads: 12
+  max_position_embeddings: 1024
+  hidden_act: silu
+  attention_dropout: 0.1
+  rms_norm_eps: 1.0e-5
+  initializer_range: 0.02
+  tie_word_embeddings: true
+  use_cache: false
+  num_local_experts: 1
+  num_experts_per_tok: 1
+  router_aux_loss_coef: 0.0
+  router_jitter_noise: 0.0
+  router_mode: none
+
+training:
+  target_exposure_units: 1_000_000_000
+  sequence_length: 1024
+  micro_batch_size: 8
+  gradient_accumulation_steps: 4
+  learning_rate: 4.0e-4
+  min_learning_rate_ratio: 0.1
+  warmup_exposure_units: 10_000_000
+  wsd_decay_fraction: 0.25
+  weight_decay: 0.1
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_epsilon: 1.0e-8
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  deterministic: true
+  gradient_checkpointing: false
+  compile: false
+  log_every_steps: 20
+  resume_every_steps: 1_000
+  resume_every_minutes: 20
+  validation_batches_per_language: 32
+  num_workers: 0
+
+checkpointing:
+  phase1_every_units: 1_000_000
+  phase1_max_units: 10_000_000
+  phase2_every_units: 10_000_000
+  phase2_max_units: 100_000_000
+  phase3_every_units: 100_000_000
+  phase3_max_units: 1_000_000_000
+  branch_prefix: chck_
+
+routing:
+  enabled: false
+  aggregate_batches_per_language: 8
+  snapshot_tokens_per_language: 50_000
+  analysis_milestones: [1_000_000, 5_000_000, 10_000_000, 50_000_000, 100_000_000, 500_000_000, 1_000_000_000]
+  bootstrap_samples: 1_000
+  permutation_samples: 1_000
+
+logging:
+  wandb_project: babymoe-babylm2026
+  wandb_entity: null
+  wandb_mode: disabled
+
+hub:
+  private: false
+  upload_tokenizer: true
+  verify_after_upload: true

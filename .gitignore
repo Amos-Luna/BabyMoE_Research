@@ -153,6 +153,7 @@ activemq-data/
 .env
 .envrc
 .venv
+.venv*/
 env/
 venv/
 ENV/
@@ -218,3 +219,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# BabyMoE generated and persistent artifacts
+artifacts/
+data/
+tokenizer/
+runs/
+checkpoints/
+hf_cache/
+*.safetensors
+*.pt
+*.pth
+wandb/

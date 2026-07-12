@@ -1,0 +1,57 @@
+include: moe_learned.yaml
+
+experiment:
+  condition_id: smoke
+  name: Tiny end-to-end smoke test
+  seed_pool: [42]
+
+paths:
+  data_dir: smoke/data
+  tokenizer_dir: smoke/tokenizer
+  runs_dir: smoke/runs
+
+data:
+  # Slightly larger than the 1M stop so document-granularity selection can
+  # cross the genuine 1M checkpoint in the synthetic smoke run.
+  unique_exposure_units: 1_100_000
+  minimum_quota_fill_ratio: 0.995
+  max_epochs: 1
+  validation_units_per_language: 10_000
+
+tokenizer:
+  vocab_size: 1_024
+  train_chars_per_language: 100_000
+  model_max_length: 128
+
+model:
+  hidden_size: 128
+  intermediate_size: 128
+  num_hidden_layers: 2
+  num_attention_heads: 4
+  num_key_value_heads: 4
+  max_position_embeddings: 128
+  num_local_experts: 4
+  num_experts_per_tok: 2
+
+training:
+  target_exposure_units: 1_000_000
+  sequence_length: 128
+  micro_batch_size: 2
+  gradient_accumulation_steps: 1
+  warmup_exposure_units: 100_000
+  log_every_steps: 1
+  resume_every_steps: 2
+  validation_batches_per_language: 1
+
+checkpointing:
+  phase1_every_units: 1_000_000
+  phase1_max_units: 1_000_000
+  phase2_every_units: 1_000_000
+  phase2_max_units: 1_000_000
+  phase3_every_units: 1_000_000
+  phase3_max_units: 1_000_000
+
+routing:
+  aggregate_batches_per_language: 1
+  snapshot_tokens_per_language: 256
+  analysis_milestones: [1_000_000]

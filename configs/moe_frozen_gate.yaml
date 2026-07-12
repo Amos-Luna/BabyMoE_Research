@@ -1,0 +1,16 @@
+include: moe_learned.yaml
+
+experiment:
+  condition_id: moe_frozen_gate
+  name: BabyMoE frozen random gate control
+  description: Randomly initialized gates are frozen; backbone and experts train.
+  seed_pool: [42]
+
+model:
+  # Match the learned-MoE objective; only gate parameters are frozen.
+  router_aux_loss_coef: 0.001
+  router_mode: frozen_random_gate
+
+training:
+  # This control is intentionally limited to the pilot horizon.
+  target_exposure_units: 10_000_000
